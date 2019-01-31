@@ -1,24 +1,188 @@
-﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
-    </div>
-</div>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <body>
+
+        <div class="container">
+            <h2>Employees Record</h2>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Add New Employee</button><br /><br />
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            ID
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Department
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="tbody"></tbody>
+            </table>
+        </div>
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        @*<button type="button" class="close" data-dissmiss="modal"><span aria-hidden="true">×</span></button>*@
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title" id="myModalLabel">Add Employee</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="empID">ID</label>
+                                <input type="text" class="form-control" id="empID" placeholder="Id" />
+                            </div>
+                            <div class="form-group">
+                                <label for="empName">Name</label>
+                                <input type="text" class="form-control" id="empName" placeholder="Name" />
+                            </div>
+                            <div class="form-group">
+                                <label for="department">Department</label>
+                                <input type="text" class="form-control" id="department" placeholder="Department" />
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btnAdd" onclick="return Add();">Add</button>
+                        @*<button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="Update();">Update</button>*@
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</head>
+</html>
+
+
+@section scripts{
+    <script type="text/javascript">
+        //Load Data in Table when documents is ready
+        $(document).ready(function () {
+            loadData();
+        });
+        //Load Data function
+        function loadData() {
+            $.ajax({
+                url: "/api/employeedata",
+                type: "GET",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        html += '<tr>';
+                        html += '<td>' + item.EmpID + '</td>';
+                        html += '<td>' + item.EmpName + '</td>';
+                        html += '<td>' + item.Department + '</td>';
+                        //html += '<td><a href="#" onclick="return getbyID(' + item.EmpID + ')">Edit</a> | <a href="#" onclick="Delete(' + item.EmpID + ')">Delete</a></td>';
+                        html += '<td><a href="#" onclick="Delete(' + item.EmpID + ')">Delete</a></td>';
+                        html += '</tr>';
+                    });
+                    $('.tbody').html(html);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        //Add Data Function
+        function Add() {
+            var empObj = {
+                EmpID: $('#empID').val(),
+                EmpName: $('#empName').val(),
+                Department: $('#department').val(),
+            };
+            $.ajax({
+                url: "/api/employeeregistration",
+                data: JSON.stringify(empObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    loadData();
+                    $('#myModal').modal('hide');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        //Function for getting the Data Based upon Employee ID
+        function getbyID(EmpID) {
+            $('#empID').css('border-color', 'lightgrey');
+            $('#empName').css('border-color', 'lightgrey');
+            $('#department').css('border-color', 'lightgrey');
+            $.ajax({
+                url: "/api/employeedata/" + EmpID,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (result) {
+                    $('#empID').val(result.EmpID);
+                    $('#empName').val(result.EmpName);
+                    $('#department').val(result.Department);
+                    $('#myModal').modal('show');
+                    $('#btnUpdate').show();
+                    $('#btnAdd').hide();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+            return false;
+        }
+        //function for updating employee's record
+        function Update() {
+
+
+            var empObj = {
+                EmpID: $('#empID').val(),
+                EmpName: $('#empName').val(),
+                Department: $('#department').val(),
+
+            };
+            $.ajax({
+                url: "/api/employeeregistration",
+                data: JSON.stringify(empObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    loadData();
+                    $('#myModal').modal('hide');
+                    $('#empID').val("");
+                    $('#empName').val("");
+                    $('#department').val("");
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        //function for deleting employee's record
+        function Delete(EmpID) {
+
+            $.ajax({
+                url: "/employee/remove/" + EmpID,
+                type: "DELETE",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (result) {
+                    loadData();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+        }
+        //Function for clearing the textboxes
+
+    </script>
+}

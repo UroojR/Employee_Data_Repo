@@ -10,11 +10,11 @@ namespace ResourcesDataAPI.Controllers
 {
     public class EmployeeDeleteController : ApiController
     {
-            [Route("employee/remove/{department}")]
-            public String DeleteEmployeeDepartment(String department)
+            [Route("employee/remove/{empID}")]
+            public String DeleteEmployee(int empID)
             {
-                Console.WriteLine("In delete Employee Department");
-                return EmployeeRegistration.getInstance().RemoveDepartment(department);
+                Console.WriteLine("In delete Employee record");
+                return EmployeeRegistration.getInstance().Remove(empID);
             }
      
     }

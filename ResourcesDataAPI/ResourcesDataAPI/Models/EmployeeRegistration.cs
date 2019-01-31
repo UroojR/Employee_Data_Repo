@@ -29,32 +29,32 @@ namespace ResourcesDataAPI.Models
         {
             employeeList.Add(employee);
         }
-        public String RemoveDepartment(String department)
+        //public String Remove(String empName)
+        //{
+        //    for (int i = 0; i < employeeList.Count; i++)
+        //    {
+        //        Employee empList = employeeList.ElementAt(i);
+        //        if (empList.EmpName.Equals(empName))
+        //        {
+        //            employeeList.RemoveAt(i);//update the new record
+        //            return "Delete successful";
+        //        }
+        //    }
+        //    return "Delete un-successful";
+        //}
+        public String Remove(int empID)
         {
             for (int i = 0; i < employeeList.Count; i++)
             {
                 Employee empList = employeeList.ElementAt(i);
-                if (empList.Department.Equals(department))
+                if (empList.EmpID.Equals(empID))
                 {
                     employeeList.RemoveAt(i);//update the new record
                     return "Delete successful";
                 }
             }
-            return "Delete un-successful";
+          return "Delete un-successful";
         }
-        ////public int RemoveEmpID(int empID)
-        ////{
-        ////    for (int i = 0; i < employeeList.Count; i++)
-        ////    {
-        ////        Employee empList = employeeList.ElementAt(i);
-        ////        if (empList.EmpID.Equals(empID))
-        ////        {
-        ////            employeeList.RemoveAt(i);//update the new record
-        ////            return 1;
-        ////        }
-        ////    }
-        ////    return -1;
-        ////}
         public List<Employee> getAllEmployees()
         {
             return employeeList;
